@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}<title>Sign In</title>{% endblock %}
+{% block content %}
+    <div class="container d-flex justify-content-center my-5">
+        <div class="card my-3 bg-light" style="width: 22rem;">
+            <div class="img-wraper d-flex justify-content-center">
+                <i class="bi bi-person-circle fs-1 my-2"></i>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Log In Form</h5>
+                <div class="form my-3" method="post">
+                    <input class="form-control my-2" type="text" name="username" placeholder="Enter your username">
+                    <input class="form-control my-2" type="password" name="pw" placeholder="Enter your password">
+                    <button class="btn btn-dark mt-3" type="submit"><i class="bi bi-box-arrow-in-right"> </i>Sign up</button>
+                </div>
+            </div>
+            <div class="card-footer">
+                <p class="text-muted">You don't have an account ? <a class="text-dark" href="/">Register here</a></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

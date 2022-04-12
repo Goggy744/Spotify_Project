@@ -1,3 +1,8 @@
+body{
+    position:absolute;
+    height: 100vh;
+    min-width: 100%;
+}
 nav div div div a{
     position: relative;
 }
@@ -19,6 +24,26 @@ nav div div div a:hover:after{
 }
 .hero{
     animation: slideIn 1.8s ease-in-out forwards;
+}
+.footer{
+    bottom: 0;
+    min-width: 100%;
+}
+.footer a {
+    position: relative;
+}
+.footer a:after{
+    content: '';
+    position: absolute;
+    background-color: black;
+    height: 3px;
+    width: 0;
+    left: 0;
+    bottom: -5px;
+    transition: .3s;
+}
+.footer a:hover:after{
+    width: 100%;
 }
 /*
 CSS ANIMATIONS

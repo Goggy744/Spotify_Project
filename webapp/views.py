@@ -13,11 +13,6 @@ navigation = {
             "/playlists": ("Playlists", "bi bi-music-note-list")}
 
 #Routes :
-@views.route("/")
-def home():
-    return render_template("base.html", nav=navigation)
-
-
 @views.route("/artists")
 def artists():
     return render_template("artists.html", nav=navigation)

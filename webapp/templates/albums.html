@@ -1,5 +1,42 @@
 {% extends 'base.html' %}
 {% block title %}<title>Albums</title>{% endblock%}
 {% block content %}
-    <h1>Albums</h1>
+    <h1 class="text-center my-5">Search for your favorites albums !</h1>
+    <div class="d-flex justify-content-around">
+        <form class="form d-flex justify-content-center my-5 h-50 w-25">
+            <input type="text" class="form-control" name="artist-nm" placeholder="Enter an album title">
+            <button class="btn btn-dark" type="submit"><i class="bi bi-search fs-5"></i></button>
+        </form>
+        <div class="top-artist my-5">
+            <h5>📀 Most famous albums</h5>
+            <table class="table">
+                <thead>
+                    <th><i class="bi bi-bookmark-heart-fill fs-5"></i></th>
+                    <th>Album's title</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>1</th>
+                        <td>Gogo</td>
+                    </tr>
+                    <tr>
+                        <th>1</th>
+                        <td>Gogo</td>
+                    </tr>
+                    <tr>
+                        <th>1</th>
+                        <td>Gogo</td>
+                    </tr>
+                    <tr>
+                        <th>1</th>
+                        <td>Gogo</td>
+                    </tr>
+                    <tr>
+                        <th>1</th>
+                        <td>Gogo</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}
