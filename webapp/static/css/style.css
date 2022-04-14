@@ -1,3 +1,8 @@
+:root{
+    --purple : #7d83ff;
+    --dark-purple : #3f4280;
+    --green: #519e8a;
+}
 body{
     position:absolute;
     height: 100vh;
@@ -9,7 +14,7 @@ nav div div div a{
 nav div div div a:after{
     content: '';
     position: absolute;
-    background-color: black;
+    background-color: var(--purple);
     height: 3px;
     width: 0;
     left: 0;
@@ -25,6 +30,16 @@ nav div div div a:hover:after{
 .hero{
     animation: slideIn 1.8s ease-in-out forwards;
 }
+.btn:hover{
+    background-color: var(--purple);
+    border:none;
+}
+.link{
+    color: black;
+}
+.link:hover{
+    color: var(--purple);
+}
 .footer{
     bottom: 0;
     min-width: 100%;
@@ -35,7 +50,7 @@ nav div div div a:hover:after{
 .footer a:after{
     content: '';
     position: absolute;
-    background-color: black;
+    background-color: var(--purple);
     height: 3px;
     width: 0;
     left: 0;

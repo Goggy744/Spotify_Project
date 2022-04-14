@@ -18,7 +18,7 @@
 <body>
     <nav class="navbar sticky-top navbar-expand-md navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/"> <i class="bi bi-file-music-fill"></i> GoGo Music</a>
+            <a class="navbar-brand" href="/"> <i class="bi bi-file-music-fill" style="color: var(--purple);"></i> GoGo Music</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -38,7 +38,7 @@
     {% block content %}
         <div class="container d-flex justify-content-around my-5 main">
             <div class="w-50 d-flex justify-content-evenly my-5 mx-2 hero">
-                <i class="bi bi-music-note-beamed fs-1 h-25 p-2 my-2"> </i>
+                <i class="bi bi-music-note-beamed fs-1 h-25 p-2 my-2" style="color: var(--purple);" > </i>
                 <p class="fs-5">
                     Search for your favorites tracks, artists and albums! <br>
                     Create your own playlists! <br>
@@ -47,7 +47,7 @@
             </div>
             <div class="card my-3 bg-light" style="width: 22rem;">
                 <div class="img-wraper d-flex justify-content-center">
-                    <i class="bi bi-person-circle fs-1 my-2"></i>
+                    <i class="bi bi-person-circle fs-1 my-2" style="color: var(--purple);"></i>
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">Register your account</h5>
@@ -60,19 +60,12 @@
                 </div>
                 <div class="card-footer">
                     <p class="text-muted">You already have an account ? 
-                        <a class="text-dark" href="/sign-in">Log in</a>
+                        <a class="link" href="/sign-in">Log in</a>
                     </p> 
                 </div>
             </div>
         </div>
     {% endblock %}
-    <footer class="navbar navbar-expand-sm navbar-light bg-light d-flex justify-content-center footer">
-        <div class="navbar-nav">
-            <a class="nav-link" href="/privacy">Privacy</a>
-            <a class="nav-link" href="/donates">Donates</a>
-            <a class="nav-link" href="/contacts">Contacts</a>
-        </div>
-    </footer>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" 
             integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" 
             crossorigin="anonymous">
@@ -82,4 +75,11 @@
             crossorigin="anonymous">
         </script>
 </body>
+<footer class="navbar navbar-expand-sm navbar-light bg-light d-flex justify-content-center footer">
+    <div class="navbar-nav">
+        <a class="nav-link" href="/privacy">Privacy</a>
+        <a class="nav-link" href="/donates">Donates</a>
+        <a class="nav-link" href="/contacts">Contacts</a>
+    </div>
+</footer>
 </html>
