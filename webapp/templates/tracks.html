@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}<title>Tracks</title>{% endblock%}
 {% block content %}
-<h1 class="text-center my-5">Search for your favorites tracks !</h1>
+<h1 class="text-center my-5 transition-swipe">Search for your favorites tracks !</h1>
 <div class="d-flex justify-content-around">
     <form class="form d-flex justify-content-center my-5 h-50 w-25">
         <input type="text" class="form-control" name="artist-nm" placeholder="Enter your track title">
@@ -17,7 +17,7 @@
             <tbody>
                 <tr>
                     <th>1</th>
-                    <td>Gogo</td>
+                    <td>{{user.username}}</td>
                 </tr>
                 <tr>
                     <th>1</th>

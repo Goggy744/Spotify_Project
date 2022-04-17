@@ -1,42 +1,32 @@
 {% extends 'base.html' %}
 {% block title %}<title>Artists</title>{% endblock%}
 {% block content %}
-    <h1 class="text-center my-5">Search for your favorites artists !</h1>
-    <div class="d-flex justify-content-around">
-        <form class="form d-flex justify-content-center my-5 h-50 w-25">
-            <input type="text" class="form-control" name="artist-nm" placeholder="Enter an artist name">
-            <button class="btn btn-dark" type="submit"><i class="bi bi-search fs-5"> </i></button>
-        </form>
-        <div class="top-artist my-5">
-            <h5>🎤 Most famous artists</h5>
-            <table class="table">
-                <thead>
-                    <th><i class="bi bi-bookmark-heart-fill fs-5"></i></th>
-                    <th>Artist's name</th>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th>1</th>
-                        <td>Gogo</td>
-                    </tr>
-                    <tr>
-                        <th>1</th>
-                        <td>Gogo</td>
-                    </tr>
-                    <tr>
-                        <th>1</th>
-                        <td>Gogo</td>
-                    </tr>
-                    <tr>
-                        <th>1</th>
-                        <td>Gogo</td>
-                    </tr>
-                    <tr>
-                        <th>1</th>
-                        <td>Gogo</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    <div class="container-fluid my-3">
+        <button type="button" class="btn btn-dark"
+        onclick="window.location.href='{{ url_for( 'views.artists') }}';"> <i class="bi bi-arrow-return-left fs-5"></i></button>
     </div>
+    {% if s_result %}
+    <h1>{{s_result.name}}</h1>
+    {% else %}
+        <h1 class="text-center my-3 transition-swipe">Search for your favorites artists !</h1>
+        <div class="d-flex justify-content-around">
+            <form class="form d-flex justify-content-center my-3 h-50 w-25" method="POST">
+                <input type="text" class="form-control" name="artist" placeholder="Enter an artist name">
+                <button class="btn btn-dark" type="submit"><i class="bi bi-search fs-5"> </i></button>
+            </form>
+        </div>
+        {% if l_result %}
+            <div class="cards d-flex justify-content-evenly my-2 w-100">
+                {% for item in l_result %}
+                <div class="card bg-transparent artist-card-{{loop.index}}">
+                    <img class="img-fluid" src="{{item.picture_big}}">
+                    <form class="card-body text-center" method="POST">
+                        <input type="text" name="artist" value="{{item.id}}" style="display: none;">
+                        <button class="btn btn-transparent text-white fs-5 border border-dark" type="submit">{{item.name}}</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endif %}
 {% endblock %}

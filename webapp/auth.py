@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from flask_login import login_required, login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from .views import navigation
+from .views import nav_user, nav_guest
 from .models import Account
 from . import db
 
@@ -22,17 +22,17 @@ def home():
         # if an account already exists with the same username => error message
         if existing_user:
             flash("Username already used", category="error")
-            return render_template("base.html", nav=navigation, user=current_user)
+            return render_template("base.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
         
         # if pw is not the same as pw-confirmation => error message
         elif password != pw_confirmation:
             flash("Password and Password Confirmation are not the same", category="error")
-            return render_template("base.html", nav=navigation, user=current_user)
+            return render_template("base.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
         
         # if username's lenght is below 3 => error message
         elif len(username) < 3:
             flash("Username must be more than 3 caracters", category="error")
-            return render_template("base.html", nav=navigation, user=current_user)
+            return render_template("base.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
         
         # else we create the account + hash the pw, add it to the db and log the user in the session + success message
         else:
@@ -45,7 +45,7 @@ def home():
 
     # else we return the actual page without doing nothing
     else:
-        return render_template("base.html", nav=navigation, user=current_user)
+        return render_template("base.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
         
 
 
@@ -63,18 +63,19 @@ def sign_in():
             # if hashed pw is correct => log the user + success message
             if check_password_hash(user.password, password):
                 flash("Logged In successfully", category="success")
+                login_user(user)
                 return redirect(url_for("auth.home"))
             # else error message about password 
             else:
                 flash("Incorrect Password", category="error")
-                return render_template("sign_in.html", nav=navigation, user=current_user)
+                return render_template("sign_in.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
         # else error message about username
         else:
             flash("Incorrect Username", category="error")
-            return render_template("sign_in.html", nav=navigation, user=current_user)
+            return render_template("sign_in.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
     # else return the page without doing nothing
     else:
-        return render_template("sign_in.html", nav=navigation)
+        return render_template("sign_in.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
 
 @auth.route("/logout")
 @login_required
@@ -82,3 +83,4 @@ def logout():
     logout_user()
     flash("Logged out successfully", category="success")
     return redirect(url_for("auth.home"))
+

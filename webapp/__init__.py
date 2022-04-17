@@ -2,6 +2,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
+from flask_login import LoginManager
 
 # Creating a database
 db = SQLAlchemy()
@@ -33,13 +34,21 @@ def create_app():
 
 
     # Importing the differents tables
-    from .models import Account, Playlist, Music
+    from .models import Account
 
 
     # Creating the database
-    #create_database(app)
+    create_database(app)
+
+ 
+    login_manager = LoginManager()
+    login_manager.login_view = 'auth.sign_in'
+    login_manager.init_app(app)
 
 
+    @login_manager.user_loader
+    def user_load(id):
+        return Account.query.get(int(id))
 
 
     # Returning the app

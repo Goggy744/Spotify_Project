@@ -5,9 +5,8 @@ class Account(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(24), unique=True)
     password = db.Column(db.String(24), unique=False)
-    playlists = db.relationship('Playlist')
 
-
+"""
 class Playlist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(24), unique=True)
@@ -20,5 +19,13 @@ class Music(db.Model):
     title = db.Column(db.String(50), unique=False)
     artist = db.Column(db.String(50), unique=False)
     album = db.Column(db.String(50), unique=False)
-    like = db.Column(db.Integer, unique=False)
     playlist_id = db.Column(db.Integer, db.ForeignKey('playlist.id'))
+    likes = db.relationship('Like')
+
+
+class Like(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    is_like = db.Column(db.Integer, primary_key=True)
+    account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    music_id = db.Column(db.Integer, db.Foreigney("music.id"))
+"""
