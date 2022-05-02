@@ -39,7 +39,7 @@ def home():
             new_account = Account(username=username, password=generate_password_hash(password, method="sha256"))
             db.session.add(new_account)
             db.session.commit()
-            login_user(new_account, remember=True)
+            login_user(new_account)
             flash("Your account has been registered", category="success")
             return redirect(url_for("auth.home"))
 

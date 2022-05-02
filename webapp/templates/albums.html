@@ -1,42 +1,36 @@
 {% extends 'base.html' %}
 {% block title %}<title>Albums</title>{% endblock%}
 {% block content %}
-    <h1 class="text-center my-5 transition-swipe">Search for your favorites albums !</h1>
-    <div class="d-flex justify-content-around">
-        <form class="form d-flex justify-content-center my-5 h-50 w-25">
-            <input type="text" class="form-control" name="artist-nm" placeholder="Enter an album title">
-            <button class="btn btn-dark" type="submit"><i class="bi bi-search fs-5"></i></button>
-        </form>
-        <div class="top-artist my-5">
-            <h5>📀 Most famous albums</h5>
-            <table class="table">
-                <thead>
-                    <th><i class="bi bi-bookmark-heart-fill fs-5"></i></th>
-                    <th>Album's title</th>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th>1</th>
-                        <td>Gogo</td>
-                    </tr>
-                    <tr>
-                        <th>1</th>
-                        <td>Gogo</td>
-                    </tr>
-                    <tr>
-                        <th>1</th>
-                        <td>Gogo</td>
-                    </tr>
-                    <tr>
-                        <th>1</th>
-                        <td>Gogo</td>
-                    </tr>
-                    <tr>
-                        <th>1</th>
-                        <td>Gogo</td>
-                    </tr>
-                </tbody>
-            </table>
+    {% if result %}
+        <div class="d-flex justify-content-around">
+            <form class="form d-flex justify-content-center h-50 w-25" method="GET">
+                <input type="text" class="form-control" name="album" placeholder="Enter an album title">
+                <button class="btn btn-dark" type="submit"><i class="bi bi-search fs-5"></i></button>
+            </form>
         </div>
-    </div>
+        <div class="d-flex justify-content-evenly my-5">
+            <img src="{{result.cover_big}}" alt="Album Cover" class="border border-dark img-fluid p-1">
+            <div class="album-information card bg-transparent border border-dark h-25 my-5">
+                <div class="card-body p-4">
+                    <h1 class="card-title text-decoration-underline">{{result.title}}</h3>
+                    <p class="card-text"> <span class="fw-bolder">Artist</span> : {{result.artist.name}}</p>
+                    <p class="card-text"><span class="fw-bolder">Number of fans</span> : {{result.fans}}</p>
+                    <p class="card-text"><span class="fw-bolder">Genres</span> : {{(result.genres|list)[0].name}}</p>
+                    <p class="card-text"><span class="fw-bolder">Number of Tracks</span> : {{result.nb_tracks}}</p>
+                    <p class="card-text"> <span class="fw-bolder">Label</span> : {{result.label}}</p>
+                    <p class="card-text"> <span class="fw-bolder">Duration</span> : {{(result.duration/60)|int}} min || {{'%0.2f'| format(result.duration/3600)}} hours</p>
+                    <p class="card-text"> <span class="fw-bolder">Release Date </span> : {{result.release_date}}</p>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <h1 class="text-center my-5 transition-swipe">Search for your favorites albums !</h1>
+        <p class="text-center my-3">You should type the exact album's title unless you will not get the wished result</p>
+        <div class="d-flex justify-content-around">
+            <form class="form d-flex justify-content-center my-5 h-50 w-25" method="GET">
+                <input type="text" class="form-control" name="album" placeholder="Enter an album title">
+                <button class="btn btn-dark" type="submit"><i class="bi bi-search fs-5"></i></button>
+            </form>
+        </div>
+    {% endif %}
 {% endblock %}

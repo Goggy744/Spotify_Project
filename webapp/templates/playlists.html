@@ -1,5 +1,42 @@
 {% extends 'base.html' %}
 {% block title %} <title>Playlists</title> {% endblock%}
 {% block content %}
-    <h1>Playlists</h1>
+    <div class="row h-100 w-100">
+        <div class="col-sm-3 h-100 w-50">
+            <div class="playlist-nav d-flex justify-content-start my-4 w-25 h-100">
+                <ul class="nav navbar-dark flex-column border border-dark p-5">
+                    <h5 class="text-center fs-3">Playlists</h5>
+                    {% for playlist in playlists %}
+                        <li class="nav-item">
+                            <a href="/playlists/{{playlist.name}}" class="nav-link">{{playlist.name}}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% if tracks %}
+            <div class="col-sm-9 w-50"> 
+                    <div class="top-tracks">
+                        <h1 class="text-center my-2">Playlist Tracks :</h1>
+                        <table class="table">
+                            <tbody>
+                                {% for track in tracks[:10] %}
+                                <tr class="border border-dark">
+                                    <td class="text-start"><i class="bi bi-play-circle text-black" aria-hidden="true" onclick="play(this, {{track.track_id}})"></i></td>
+                                    <td class="text-start">
+                                        <audio controls id="{{track.track_id}}" class="hidden">
+                                            <source src="{{ client.get_track(track.track_id).preview}}" type="audio/mp3">
+                                          Your browser does not support the audio element.
+                                        </audio>
+                                    </td>
+                                    <td class=" text-end text-white">{{ client.get_track(track.track_id).title_short }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

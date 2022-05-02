@@ -1,42 +1,77 @@
 {% extends 'base.html' %}
 {% block title %}<title>Tracks</title>{% endblock%}
 {% block content %}
-<h1 class="text-center my-5 transition-swipe">Search for your favorites tracks !</h1>
-<div class="d-flex justify-content-around">
-    <form class="form d-flex justify-content-center my-5 h-50 w-25">
-        <input type="text" class="form-control" name="artist-nm" placeholder="Enter your track title">
-        <button class="btn btn-dark" type="submit"><i class="bi bi-search fs-5"></i></button>
-    </form>
-    <div class="top-artist my-5">
-        <h5>🎧 Most famous tracks</h5>
-        <table class="table">
-            <thead>
-                <th><i class="bi bi-bookmark-heart-fill fs-5"></i></th>
-                <th>Track's title</th>
-            </thead>
-            <tbody>
-                <tr>
-                    <th>1</th>
-                    <td>{{user.username}}</td>
-                </tr>
-                <tr>
-                    <th>1</th>
-                    <td>Gogo</td>
-                </tr>
-                <tr>
-                    <th>1</th>
-                    <td>Gogo</td>
-                </tr>
-                <tr>
-                    <th>1</th>
-                    <td>Gogo</td>
-                </tr>
-                <tr>
-                    <th>1</th>
-                    <td>Gogo</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+    {% if result %}
+        {% if (request.args.keys()|list)[0] == "track" %}
+            <div class="cards d-flex justify-content-evenly my-2 w-100">
+                {% for track in result %}
+                    <div class="card bg-transparent artist-card-{{loop.index}}">
+                        <img class="img-fluid" src="{{track.artist.picture_big}}" alt="This track has no artist picture">
+                        <form class="card-body text-center" method="GET">
+                            <input type="text" name="id" value="{{track.id}}" style="display: none;">
+                            <button class="btn btn-transparent text-white fs-5 border border-dark" type="submit">{{track.title}}</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <h1 class="text-center"> {{ result.title }}</h1>
+            <div class="d-flex justify-content-evenly">
+                <div class="track-information card bg-transparent border border-dark h-25 my-5">
+                    <div class="card-body p-4">
+                        <h1 class="card-title text-decoration-underline">{{result.title}}</h3>
+                        <p class="card-text"> <span class="fw-bolder">Artist</span> : {{result.artist.name}}</p>
+                        <p class="card-text"><span class="fw-bolder">Album</span> : {{result.album.title}}</p>
+                        <p class="card-text"><span class="fw-bolder">Disk Number</span> : {{result.disk_number}}</p>
+                        <p class="card-text"> <span class="fw-bolder">Gain</span> : {{result.gain}}</p>
+                        <p class="card-text"> <span class="fw-bolder">Duration</span> : {{(result.duration/60)|int}} min</p>
+                        <p class="card-text"> <span class="fw-bolder">Release Date </span> : {{result.release_date}}</p>
+                    </div>
+                </div>
+                <div class="d-flex flex-column my-5 ">
+                    <table class="table my-5">
+                        <tbody>
+                            <tr class="border border-dark">
+                                {% if result.id in likedSong %}
+                                    <td class="text-start"><i class="bi bi-heart-fill text-danger" aria-hidden="true" onclick="like(this, {{result.id}}, {{user.id}}, NaN)"></i></td>
+                                {% else %}
+                                    <td class="text-start"><i class="bi bi-heart text-danger" aria-hidden="true" onclick="like(this, {{result.id}}, {{user.id}}, NaN)"></i></td>
+                                {% endif %}
+                                {% if result.id in userPlaylistTrack %}
+                                    <td class="text-start"><i class="bi bi-check-circle-fill text-black" aria-hidden="true" onclick="addToPlaylist(this, {{result.id}}, {{user.id}}, NaN)"></i></td>
+                                {% else %}
+                                    <td class="text-start"><i class="bi bi-plus-circle text-black" aria-hidden="true" onclick="addToPlaylist(this, {{result.id}}, {{user.id}}, NaN)"></i></td>
+                                {% endif %}
+                                <td class="text-start"><i class="bi bi-play-circle text-black" aria-hidden="true" onclick="play(this, {{result.id}})"></i></td>
+                                <td class=" text-end text-white">{{ result.title_short }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-center">
+                        <form class="form-group form-wraper bg-dark p-3 w-25 hidden" id="playlist-form" method="POST" action="/add-song">
+                            <h5 style="color:var(--purple);">Playlist Form :</h5>
+                            <input type="text" class="form-control" name="track" id="track-id" style="display: none;">
+                            <input type="text" class="form-control" name="user" value="{{user.id}}" style="display: none;">
+                            <input type="text" class="form-control" name="track_url" value="{{result.id}}" style="display:none;">
+                            <input type="text" class="form-control" name="artist_url" value="" style="display:none;">
+                            <input class="form-control my-3" type="text" name="playlist-title" placeholder="Enter a playlist name">
+                            <input class="btn btn-light w-50" type="submit" value="Add">
+                        </form>
+                    </div>
+                    <audio controls id="{{result.id}}" class="hidden">
+                        <source src="{{ result.preview }}" type="audio/mp3">
+                      Your browser does not support the audio element.
+                    </audio>
+                </div>
+            </div>Ò
+        {% endif %}
+    {% else %}
+        <h1 class="text-center my-3 transition-swipe">Search for your favorites tracks !</h1>
+        <div class="d-flex justify-content-around">
+        <form class="form d-flex justify-content-center my-3 h-50 w-25" method="GET">
+            <input type="text" class="form-control" name="track" placeholder="Enter a track title">
+            <button class="btn btn-dark" type="submit"><i class="bi bi-search fs-5"> </i></button>
+        </form>
+        </div>
+    {% endif %}
 {% endblock %}

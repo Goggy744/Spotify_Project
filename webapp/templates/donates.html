@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %} <title>Donates</title> {% endblock %}
+{% block content %}
+<div class="d-flex justify-content-center">
+    <form class="row needs-validation w-50 bg-transparent border border-dark rounded p-3" novalidate method="POST">
+        <h1 class="text-center my-2">Donation Form</h1>
+        <div class="col-md-6 my-2">
+          <label for="validationCustom01" class="form-label">First name</label>
+          <input type="text" class="form-control" name="fname" id="validationCustom01" required>
+          <div class="valid-feedback">
+            Looks good!
+          </div>
+        </div>
+        <div class="col-md-6 my-2">
+          <label for="validationCustom02" class="form-label">Last name</label>
+          <input type="text" class="form-control" name="lname" id="validationCustom02" required>
+          <div class="valid-feedback">
+            Looks good!
+          </div>
+        </div>
+        <div class="col-md-6 my-2">
+          <label for="validationCustomUsername" class="form-label">Email Adress</label>
+          <div class="input-group has-validation">
+            <input type="text" class="form-control" name="email" id="validationCustomUsername" aria-describedby="inputGroupPrepend" required>
+            <div class="invalid-feedback">
+              Please choose an email adress
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 my-2">
+          <label for="validationCustom03" class="form-label">City</label>
+          <input type="text" class="form-control" name="city" id="validationCustom03" required>
+          <div class="invalid-feedback">
+            Please provide a valid city.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label for="validationCustom04" class="form-label">Credit Card(A false of course!)</label>
+          <input type="text" class="form-control" name="credit-card" placeholder="A false of course !">
+          <div class="invalid-feedback">
+            Please enter a credit card number
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label for="validationCustom05" class="form-label">Zip</label>
+          <input type="text" class="form-control" name="zip" id="validationCustom05" required>
+          <div class="invalid-feedback">
+            Please provide a valid zip.
+          </div>
+        </div>
+        <div class="col-6 my-3">
+            <label for="donation" class="form-label">Set a donation</label>
+            <div class="input-group has-validation">
+                <input type="text" class="form-control" name="donation" id="donation" reuqired>
+                <span class="input-group-text" id="inputGroupPrepend">$</span>
+                <div class="invalid-feedback">
+                    Please enter an amount of money
+                </div>
+            </div> 
+        </div>        
+        <div class="col-12">
+          <button class="btn btn-dark" type="submit">Submit</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

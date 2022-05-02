@@ -1,32 +1,111 @@
 {% extends 'base.html' %}
 {% block title %}<title>Artists</title>{% endblock%}
 {% block content %}
-    <div class="container-fluid my-3">
-        <button type="button" class="btn btn-dark"
-        onclick="window.location.href='{{ url_for( 'views.artists') }}';"> <i class="bi bi-arrow-return-left fs-5"></i></button>
-    </div>
-    {% if s_result %}
-    <h1>{{s_result.name}}</h1>
-    {% else %}
-        <h1 class="text-center my-3 transition-swipe">Search for your favorites artists !</h1>
-        <div class="d-flex justify-content-around">
-            <form class="form d-flex justify-content-center my-3 h-50 w-25" method="POST">
-                <input type="text" class="form-control" name="artist" placeholder="Enter an artist name">
-                <button class="btn btn-dark" type="submit"><i class="bi bi-search fs-5"> </i></button>
-            </form>
-        </div>
-        {% if l_result %}
+    {% if result %}
+        {% if (request.args.keys()|list)[0] == "id" %}
+            <div class="container-fluid my-3">
+                <div class="row m-2">
+                    <div class="artist-picture col-md-3">
+                        <img class="img-fluid border border-dark p-1" src="{{result.picture_medium}}" alt="Artist profile picture">
+                    </div>
+                    <div class="artist-name col-lg-6 w-50">
+                        <form class="form d-flex justify-content-center my-3 h-25" method="GET">
+                            <input type="text" class="form-control h-75" name="artist" placeholder="Enter an artist name">
+                            <button class="btn btn-dark h-75" type="submit"><i class="bi bi-search fs-5"> </i></button>
+                        </form>
+                        <h1 class="p-3 text-center" style="font-size: 4em ;">{{result.name}}</h1>
+                    </div>
+                    <div class="artist-bio col-lg-3 card bg-transparent border border-dark w-25">
+                        <div class="card-body py-3">
+                            <h5 class="card-title text-center text-white my-3">Artist's Information :</h5>
+                            <p class="card-text"><span class="fw-bolder">Number of albums</span> : {{result.nb_album}}</p>
+                            <p class="card-text"> <span class="fw-bolder">Number of fans</span> : {{result.nb_fan}}</p>
+                            <p class="card-text"><span class="fw-bolder">Genre</span> : {{client.get_genre(result.get_albums()[0].genre_id).name}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <form class="form-group form-wraper bg-dark p-3 w-25 hidden" id="playlist-form" method="POST" action="/add-song">
+                        <h5 style="color:var(--purple);">Playlist Form :</h5>
+                        <input type="text" class="form-control" name="track" id="track-id" style="display: none;">
+                        <input type="text" class="form-control" name="user" value="{{user.id}}" style="display: none;">
+                        <input type="text" class="form-control" name="artist_url" value="{{result.id}}" style="display:none;">
+                        <input type="text" class="form-control" name="track_url" value="" style="display:none;">
+                        <input class="form-control my-3" type="text" name="playlist-title" placeholder="Enter a playlist name">
+                        <input class="btn btn-light w-50" type="submit" value="Add">
+                    </form>
+                </div>
+                <div class="discography">
+                    <div class="d-flex justify-content-center">
+                        <button type="button" class="btn btn-dark disabled" id="btn-top-tracks" onclick="hideAlbums()">Top Tracks</button>
+                        <button type="button" class="btn btn-dark" id="btn-top-albums" onclick="hideTracks()">Top Albums</button>
+                    </div>
+                    <div class="d-flex justify-content-center my-3">
+                        <div class="top-tracks w-50" id="top-tracks">
+                            <h1 class="text-center my-2">Top Tracks :</h1>
+                            <table class="table">
+                                <tbody>
+                                    {% for track in (result.get_top()|list)[:10] %}
+                                    <tr class="border border-dark">
+                                        {% if track.id in likedSong %}
+                                            <td class="text-start"><i class="bi bi-heart-fill text-danger" aria-hidden="true" onclick="like(this, {{track.id}}, {{user.id}}, {{result.id}})"></i></td>
+                                        {% else %}
+                                            <td class="text-start"><i class="bi bi-heart text-danger" aria-hidden="true" onclick="like(this, {{track.id}}, {{user.id}}, {{result.id}})"></i></td>
+                                        {% endif %}
+                                        {% if track.id in userPlaylistTrack %}
+                                        <td class="text-start"><i class="bi bi-check-circle-fill text-black" aria-hidden="true" onclick="addToPlaylist(this, {{track.id}}, {{user.id}}, {{result.id}})"></i></td>
+                                        {% else %}
+                                        <td class="text-start"><i class="bi bi-plus-circle text-black" aria-hidden="true" onclick="addToPlaylist(this, {{track.id}}, {{user.id}}, {{result.id}})"></i></td>
+                                        {% endif %}
+                                        <td class="text-start"><i class="bi bi-play-circle text-black" aria-hidden="true" onclick="play(this, {{track.id}})"></i></td>
+                                        <td class="text-start">
+                                            <audio controls id="{{track.id}}" class="hidden">
+                                                <source src="{{ track.preview}}" type="audio/mp3">
+                                              Your browser does not support the audio element.
+                                            </audio>
+                                        </td>
+                                        <td class=" text-end text-white">{{ track.title_short }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="top-albums w-50 hidden" id="top-albums">
+                            <h1 class="text-center my-2">Top Albums :</h1>
+                            <table class="table">
+                                <tbody>
+                                    {% for album in (result.get_albums()|list)[:10] %}
+                                        <tr class="border border-dark">
+                                            <td class=" text-end text-white">{{ album.title }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %} 
+        {% if (request.args.keys()|list)[0] == "artist" %}
             <div class="cards d-flex justify-content-evenly my-2 w-100">
-                {% for item in l_result %}
+                {% for item in result %}
                 <div class="card bg-transparent artist-card-{{loop.index}}">
-                    <img class="img-fluid" src="{{item.picture_big}}">
-                    <form class="card-body text-center" method="POST">
-                        <input type="text" name="artist" value="{{item.id}}" style="display: none;">
+                    <img class="img-fluid" src="{{item.picture_big}}" alt="This artist has no profile picture">
+                    <form class="card-body text-center" method="GET">
+                        <input type="text" name="id" value="{{item.id}}" style="display: none;">
                         <button class="btn btn-transparent text-white fs-5 border border-dark" type="submit">{{item.name}}</button>
                     </form>
                 </div>
                 {% endfor %}
             </div>
-        {% endif %}
+        {% endif %}>
+    {% else %}
+        <h1 class="text-center my-3 transition-swipe">Search for your favorites artists !</h1>
+        <div class="d-flex justify-content-around">
+            <form class="form d-flex justify-content-center my-3 h-50 w-25" method="GET">
+                <input type="text" class="form-control" name="artist" placeholder="Enter an artist name">
+                <button class="btn btn-dark" type="submit"><i class="bi bi-search fs-5"> </i></button>
+            </form>
+        </div>
     {% endif %}
 {% endblock %}

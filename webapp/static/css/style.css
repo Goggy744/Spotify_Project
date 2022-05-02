@@ -32,27 +32,6 @@ nav div div div a:hover:after{
 nav div div div a i{
     color: var(--pink);
 }
-.transition-fade{
-    opacity: 1;
-    transition: 500ms;
-    transform: translateX(0);
-    transform-origin: left;
-}
-html.is-animating .transition-fade{
-    opacity: 1;
-    transform: translateX(100%);
-}
-html.is-leaving .transition-fade{
-    opacity: 0;
-    transform:translateX(0);
-}
-.transition-swipe{
-    transition: 800ms;
-    transform: translateY(0);
-}
-html.is-animating .transition-swipe{
-    transform: translateY(100px);
-}
 .uncheck{
     background-color: var(--pink);
 }
@@ -65,7 +44,7 @@ html.is-animating .transition-swipe{
 .hero{
     animation: slideIn 1.8s ease-in-out forwards;
 }
-h1,p{
+h1, .important-text{
     color: var(--purple);
     text-shadow: 3px 5px 2px #474747, 2px 2px 2px rgba(206,89,55,0);
 }
@@ -80,11 +59,7 @@ h1,p{
     color: var(--pink);
 }
 .footer{
-    position: fixed;
-    bottom: 0;
-    overflow-y: scroll;
-    min-width: 100%;
-    margin-top: 10rem;
+    position: relative;
 }
 .footer a {
     position: relative;
@@ -114,6 +89,25 @@ h1,p{
 .artist-card-3{
     animation: slideIn2 1.5s ease-in-out forwards;
 }
+.artist-bio h5{
+    color: var(--purple);
+}
+.artist-bio p{
+    color: white;
+}
+.hidden{
+    display: none;
+}
+.bi-heart, .bi-heart-fill, .bi-check-circle-fill, .bi-plus-circle, .bi-play-circle{
+    cursor: pointer;
+}
+.form-wraper{
+    position: fixed;
+    transform: translateY(50px);
+    border-radius: 10px;
+}
+
+
 /*
 CSS ANIMATIONS
 */

@@ -1,9 +1,11 @@
 # Imports :
-import re
-from flask import Blueprint, render_template, request, redirect, url_for
+from threading import currentThread
+from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash
 from flask_login import current_user, login_required
-import deezer
-
+from .static import deezer
+import json
+from . import db
+from .models import LikedSong, Playlist, Track
 
 # Functions :
 def search_artist(client, input):
@@ -41,6 +43,7 @@ def search_artist(client, input):
 
 
 
+
 #MAIN PROGRAM#
 
 
@@ -62,41 +65,245 @@ nav_user = {
             "/logout": ("Logout", "bi bi-box-arrow-left")}
 
 
-# Creating the client object
-client = deezer.Client()
-
-
 #Routes :
 @views.route("/artists", methods=["POST", "GET"])
+@login_required
 def artists():
-    if request.method == "POST":
-        input = request.form.get("artist")
-        print(input, input.isdigit())
-        if not input.isdigit():
-            list_result = search_artist(client, input)
-            single_result = None
-            return render_template("artists.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user, l_result=list_result, s_result=single_result)
-        else:
-            list_result = None
-            single_result = client.get_artist(int(input))
-            return render_template("artists.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user, l_result=list_result, s_result=single_result)
+    client = deezer.Client()
+    userLikedSong = []
+    userPlaylistTrack = []
+    for like in LikedSong.query.filter_by(account_id=current_user.id).all():
+        userLikedSong.append(int(like.track_id))
+    for playlist in Playlist.query.filter_by(account_id=current_user.id).all():
+        for track in Track.query.filter_by(playlist_id=playlist.id).all():
+            userPlaylistTrack.append(int(track.track_id)) 
+    if request.args:
+        arg = tuple(request.args.keys())[0]
+        if arg == "artist":
+            input = request.args.get(arg)
+            if input == "":
+                flash("Input field must not be empty", category="error")
+                return render_template("artists.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user, result=None)
+            else:
+                result = search_artist(client, input)
+                return render_template("artists.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user, result=result)
+        elif arg == "id":
+            input = request.args.get(arg)
+            result = client.get_artist(int(input))
+            return render_template("artists.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user, result=result, client=client, likedSong=userLikedSong, userPlaylistTrack=userPlaylistTrack)
     else:
-        list_result = None
-        single_result = None
-        return render_template("artists.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user, l_result=list_result, s_result=single_result)
+        return render_template("artists.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user, result=None)
 
 
 @views.route("/tracks")
+@login_required
 def tracks():
-    return render_template("tracks.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
+    userLikedSong = []
+    userPlaylistTrack = []
+    for like in LikedSong.query.filter_by(account_id=current_user.id).all():
+        userLikedSong.append(int(like.track_id))
+    for playlist in Playlist.query.filter_by(account_id=current_user.id).all():
+        for track in Track.query.filter_by(playlist_id=playlist.id).all():
+            userPlaylistTrack.append(int(track.track_id)) 
+    client = deezer.Client()
+    if request.args:
+        arg = tuple(request.args.keys())[0]
+        if arg == "track":
+            input = request.args.get(arg)
+            if input == "":
+                flash("Input field must not be empty", category="error")
+                return render_template("tracks.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user, result=None)
+            else:
+                raw_result = client.search(input)
+                dict = {}
+                rank_list = []
+                result = []
+                for track in raw_result:
+                    dict.update({track.rank: track})
+                    rank_list.append(track.rank)
+                if len(rank_list) == 0:
+                    flash("Sorry but no tracks matches your research", category="error")
+                    return render_template("tracks.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user, result=None)
+                else:
+                    rank_list.sort(reverse=True)
+                    for i in range(3):
+                        result.append(dict[rank_list[i]])
+                    return render_template("tracks.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user, result=result)
+        else:
+            input = request.args.get(arg)
+            result = client.get_track(int(input))
+            return render_template("tracks.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user, result=result, likedSong=userLikedSong, userPlaylistTrack=userPlaylistTrack)
+
+    else:
+        return render_template("tracks.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user, result=None)
 
 
 @views.route("/albums")
+@login_required
 def albums():
-    return render_template("albums.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
+    client = deezer.Client()
+    if request.args:
+        arg = tuple(request.args.keys())[0]
+        if arg == "album":
+            input = request.args.get(arg)
+            if input == "":
+                flash("Input shoud not be empty !", category="error")
+                return render_template("albums.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
+            else:
+                raw_result = tuple(client.search(album=input))
+                dict = {}
+                rank_list = []
+                for track in raw_result:
+                    dict.update({track.rank: track})
+                    rank_list.append(track.rank)
+                if len(rank_list) == 0:
+                    flash("Sorry but no albums matches your research", category="error")
+                    return render_template("albums.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
+                else:
+                    rank_list.sort(reverse=True)
+                    result = dict[rank_list[0]].get_album()
+                    return render_template("albums.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user, result=result)
+    else:
+        return render_template("albums.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
 
 
 @views.route("/playlists")
 @login_required
 def playlists():
-    return render_template("playlists.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
+    playlists = Playlist.query.filter_by(account_id=current_user.id).all()
+    return render_template("playlists.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user, playlists=playlists, playlist=None)
+
+
+@views.route("/playlists/<playlist_name>")
+@login_required
+def playlist(playlist_name):
+    client = deezer.Client()
+    playlists = Playlist.query.filter_by(account_id=current_user.id).all()
+    playlist = Playlist.query.filter_by(account_id=current_user.id, name=playlist_name).first()
+    tracks = Track.query.filter_by(playlist_id=playlist.id).all()
+    if playlist:
+        return render_template("playlists.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user, playlists=playlists, tracks=tracks, client=client)
+
+
+@views.route("/like-song", methods=["POST"])
+@login_required
+def like_song():
+    data = json.loads(request.data)
+    track_id = data['track_id']
+    new_like = LikedSong(track_id=track_id, account_id=current_user.id)
+    db.session.add(new_like)
+    db.session.commit()
+    return jsonify({})
+
+
+@views.route("/unlike-song", methods=["POST"])
+@login_required
+def unlike_song():
+    data = json.loads(request.data)
+    track_id = data['track_id']
+    for like in LikedSong.query.filter_by(account_id=current_user.id).all():
+        if like.track_id == track_id:
+            db.session.delete(like)
+            db.session.commit()
+            return jsonify({})
+
+
+@views.route("/add-song", methods=["POST"])
+@login_required
+def add_song():
+    track_id = request.form.get("track")
+    playlist_name = request.form.get("playlist-title")
+    user_id = int(request.form.get("user"))
+    artist_url = request.form.get("artist_url")
+    track_url = request.form.get("track_url")
+    
+    if artist_url == "":
+        url = f"/tracks?id={int(track_url)}"
+    else:
+        url = f"/artists?id={int(artist_url)}"
+    
+    if user_id == current_user.id:
+        existing_playlist = Playlist.query.filter_by(account_id=current_user.id, name=playlist_name).first()
+        if existing_playlist:
+            new_track = Track(track_id=track_id, playlist_id=existing_playlist.id)
+            db.session.add(new_track)
+            db.session.commit()
+            return redirect(url)
+        else:
+            new_playlist = Playlist(name=playlist_name, account_id=user_id)
+            db.session.add(new_playlist)
+            db.session.commit()
+            playlist = Playlist.query.filter_by(name=playlist_name).first()
+            new_track = Track(track_id=track_id, playlist_id=playlist.id)
+            db.session.add(new_track)
+            db.session.commit()
+            return redirect(url)
+    else:
+        return redirect(url)
+
+@views.route("/remove-song", methods=["POST"])
+@login_required
+def remove_song():
+    data = json.loads(request.data)
+    track_id = data["track_id"]
+
+    for playlist in Playlist.query.filter_by(account_id=current_user.id).all():
+        for track in Track.query.filter_by(playlist_id=playlist.id).all():
+            if track.track_id == track_id:
+                db.session.delete(track)
+                db.session.commit()
+                return jsonify({})
+        
+
+@views.route("/privacy")
+def privacy():
+    return render_template("privacy.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
+
+
+@views.route("/donates", methods=["POST", "GET"])
+@login_required
+def donates():
+    if request.method == "POST":
+        lname = request.form.get("lname")
+        fname = request.form.get("fname")
+        email = request.form.get("email")
+        city = request.form.get("city")
+        creditCard = request.form.get("credit-card")
+        zip = request.form.get("zip")
+        donation = request.form.get("donation")
+        checked = request.form.get("checkbox")
+
+        if lname == "":
+            flash("You must provide a last name", category="error")
+            return render_template("donates.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
+        if fname == "":
+                    flash("You must provide a first name", category="error")
+                    return render_template("donates.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
+        if email == "":
+                    flash("You must provide an email", category="error")
+                    return render_template("donates.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
+        if city == "":
+                    flash("You must provide a city", category="error")
+                    return render_template("donates.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
+        if creditCard == "":
+                    flash("You must provide a creditCard", category="error")
+                    return render_template("donates.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
+        if zip == "":
+                    flash("You must provide a zip", category="error")
+                    return render_template("donates.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
+
+        if donation == "":
+                    flash("You must provide an amount of money", category="error")
+                    return render_template("donates.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
+        if checked == "":
+                    flash("You must check the agreement", category="error")
+                    return render_template("donates.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
+        flash("Your donation has been well received", category="success")
+        return redirect(url_for("auth.home"))
+    else:
+        return render_template("donates.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
+
+
+@views.route("/contacts")
+def contacts():
+    return render_template("contacts.html", nav_guest=nav_guest, nav_user=nav_user, user=current_user)
